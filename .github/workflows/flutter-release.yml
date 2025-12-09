@@ -1,14 +1,14 @@
-name: Flutter Release APK
+name: Flutter Installable APK
 
 on:
   push:
     branches:
-      - main  # অথবা আপনার release branch
+      - main
 
 jobs:
   build:
-    name: Build Release APK
-    runs-on: ubuntu-latest
+    name: Build Installable APK
+    runs-on: ubuntu-latest   # অথবা windows-latest
 
     steps:
     - name: Checkout repository
@@ -17,27 +17,16 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.13.10' # আপনার Flutter version
+        flutter-version: '3.13.10'
 
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Decode keystore
-      run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/my-release-key.jks
-
-    - name: Set up signing properties
-      run: |
-        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
-        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-        echo "storeFile=my-release-key.jks" >> android/key.properties
-
-    - name: Build APK (release)
-      run: flutter build apk --release
+    - name: Build debug APK
+      run: flutter build apk --debug
 
     - name: Upload APK as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: app-release.apk
-        path: build/app/outputs/flutter-apk/app-release.apk
+        name: app-debug.apk
+        path: build/app/outputs/flutter-apk/app-debug.apk
