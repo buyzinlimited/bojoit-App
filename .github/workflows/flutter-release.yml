@@ -7,26 +7,29 @@ on:
 
 jobs:
   build:
-    name: Build Installable APK
-    runs-on: ubuntu-latest   # অথবা windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
+    - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.13.10'
 
-    - name: Install dependencies
+    - name: Accept Android licenses
+      run: yes | sdkmanager --licenses || true
+
+    - name: Enable Android SDK tools
+      run: |
+        sdkmanager "platforms;android-33" "build-tools;33.0.0"
+
+    - name: Get dependencies
       run: flutter pub get
 
     - name: Build debug APK
       run: flutter build apk --debug
 
-    - name: Upload APK as artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
         name: app-debug.apk
         path: build/app/outputs/flutter-apk/app-debug.apk
